@@ -3,20 +3,24 @@ package cpu
 import "perissinotto_nes/bus"
 
 type CPU struct {
-	A  byte
-	X  byte
-	Y  byte
-	SP byte
-	PC uint16
+	A, X, Y byte
+	PC      uint16
+	SP      byte
+	Status  byte
 
-	Bus *bus.Bus
+	Bus    *bus.Bus
+	cycles int
+
+	opcodeTable [256]func(*CPU)
 }
 
-func NewCPU(b *bus.Bus) *CPU {
+func NewCPU(bus *bus.Bus) *CPU {
 	c := &CPU{
-		Bus: b,
+		Bus: bus,
+		SP:  0xFD,
 	}
 	c.Reset()
+	c.initOpcodes()
 	return c
 }
 
@@ -25,17 +29,17 @@ func (c *CPU) Reset() {
 	c.X = 0
 	c.Y = 0
 	c.SP = 0xFD
-	c.PC = uint16(c.Bus.Read(0xFFFC)) | uint16(c.Bus.Read(0xFFFD))<<8
+	c.Status = 0x24
+
+	lo := c.Bus.Read(0xFFFC)
+	hi := c.Bus.Read(0xFFFD)
+	c.PC = uint16(hi)<<8 | uint16(lo)
+
+	c.cycles = 7
 }
 
 func (c *CPU) Step() {
 	opcode := c.Bus.Read(c.PC)
 	c.PC++
-
-	switch opcode {
-	case 0xA9: // LDA imediato
-		value := c.Bus.Read(c.PC)
-		c.PC++
-		c.A = value
-	}
+	c.opcodeTable[opcode](c)
 }
