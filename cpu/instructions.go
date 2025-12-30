@@ -32,8 +32,18 @@ func (c *CPU) opLDA_ZPX() {
 	c.cycles += 3
 }
 
+// LDA $nnnn
 func (c *CPU) opLDA_ABS() {
 	addr := c.addrAbsolute()
+
+	c.A = c.Bus.Read(uint16(addr))
+	c.setZN(c.A)
+	c.cycles += 3
+}
+
+// LDA $nnnn,x
+func (c *CPU) opLDA_ABSX() {
+	addr := c.addrAbsoluteX()
 
 	c.A = c.Bus.Read(uint16(addr))
 	c.setZN(c.A)

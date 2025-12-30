@@ -19,3 +19,10 @@ func (c *CPU) addrAbsolute() uint16 {
 	c.PC += 2
 	return uint16(highByte)<<8 | uint16(lowByte)
 }
+
+func (c *CPU) addrAbsoluteX() uint16 {
+	lowByte := c.Bus.Read(c.PC)
+	highByte := c.Bus.Read(c.PC + 1)
+	c.PC += 2
+	return (uint16(highByte)<<8 | uint16(lowByte)) + uint16(c.X)
+}
