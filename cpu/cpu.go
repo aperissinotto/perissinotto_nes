@@ -9,15 +9,14 @@ type CPU struct {
 	Status  byte
 
 	Bus    *bus.Bus
-	cycles int
+	cycles uint64
 
-	opcodeTable [256]func(*CPU)
+	opcodes [256]Instruction
 }
 
 func NewCPU(bus *bus.Bus) *CPU {
 	c := &CPU{
 		Bus: bus,
-		SP:  0xFD,
 	}
 	c.Reset()
 	c.initOpcodes()
@@ -25,11 +24,8 @@ func NewCPU(bus *bus.Bus) *CPU {
 }
 
 func (c *CPU) Reset() {
-	c.A = 0
-	c.X = 0
-	c.Y = 0
 	c.SP = 0xFD
-	c.Status = 0x24
+	c.Status = 0x34
 
 	lo := c.Bus.Read(0xFFFC)
 	hi := c.Bus.Read(0xFFFD)
@@ -41,5 +37,14 @@ func (c *CPU) Reset() {
 func (c *CPU) Step() {
 	opcode := c.Bus.Read(c.PC)
 	c.PC++
-	c.opcodeTable[opcode](c)
+
+	inst := c.opcodes[opcode]
+
+	extraCycle := inst.exec()
+
+	c.cycles += uint64(inst.cycles)
+
+	if extraCycle {
+		c.cycles++
+	}
 }
