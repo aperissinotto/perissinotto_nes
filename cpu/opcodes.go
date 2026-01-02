@@ -7,6 +7,12 @@ type Instruction struct {
 }
 
 func (c *CPU) initOpcodes() {
+	c.opcodes[0xA0] = Instruction{
+		name:   "LDY #imm",
+		exec:   c.opLDY_IMM,
+		cycles: 2,
+	}
+
 	c.opcodes[0xA1] = Instruction{
 		name:   "LDA ($nn,X)",
 		exec:   c.opLDA_INDX,
@@ -17,6 +23,12 @@ func (c *CPU) initOpcodes() {
 		name:   "LDX #imm",
 		exec:   c.opLDX_IMM,
 		cycles: 2,
+	}
+
+	c.opcodes[0xA4] = Instruction{
+		name:   "LDY $nn",
+		exec:   c.opLDY_ZP,
+		cycles: 3,
 	}
 
 	c.opcodes[0xA5] = Instruction{
@@ -37,9 +49,27 @@ func (c *CPU) initOpcodes() {
 		cycles: 2,
 	}
 
+	c.opcodes[0xAA] = Instruction{
+		name:   "TAX X=A",
+		exec:   c.opTAX,
+		cycles: 2,
+	}
+
+	c.opcodes[0xAC] = Instruction{
+		name:   "LDY $nnnn",
+		exec:   c.opLDY_ABS,
+		cycles: 4,
+	}
+
 	c.opcodes[0xAD] = Instruction{
 		name:   "LDA $nnnn",
 		exec:   c.opLDA_ABS,
+		cycles: 4,
+	}
+
+	c.opcodes[0xAE] = Instruction{
+		name:   "LDX $nnnn",
+		exec:   c.opLDX_ABS,
 		cycles: 4,
 	}
 
@@ -49,9 +79,21 @@ func (c *CPU) initOpcodes() {
 		cycles: 5,
 	}
 
+	c.opcodes[0xB4] = Instruction{
+		name:   "LDY $nn,X",
+		exec:   c.opLDY_ZPX,
+		cycles: 4,
+	}
+
 	c.opcodes[0xB5] = Instruction{
 		name:   "LDA $nn,X",
 		exec:   c.opLDA_ZPX,
+		cycles: 4,
+	}
+
+	c.opcodes[0xB6] = Instruction{
+		name:   "LDX $nn,Y",
+		exec:   c.opLDX_ZPY,
 		cycles: 4,
 	}
 
@@ -61,9 +103,21 @@ func (c *CPU) initOpcodes() {
 		cycles: 4,
 	}
 
+	c.opcodes[0xBC] = Instruction{
+		name:   "LDY $nnnn,X",
+		exec:   c.opLDY_ABSX,
+		cycles: 4,
+	}
+
 	c.opcodes[0xBD] = Instruction{
 		name:   "LDA $nnnn,X",
 		exec:   c.opLDA_ABSX,
+		cycles: 4,
+	}
+
+	c.opcodes[0xBE] = Instruction{
+		name:   "LDX $nnnn,Y",
+		exec:   c.opLDX_ABSY,
 		cycles: 4,
 	}
 

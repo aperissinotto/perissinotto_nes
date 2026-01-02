@@ -13,6 +13,13 @@ func (c *CPU) addrZeroPageX() uint16 {
 	return uint16(addr)
 }
 
+func (c *CPU) addrZeroPageY() uint16 {
+	addr := c.Bus.Read(c.PC)
+	c.PC++
+	addr = (addr + c.Y) & 0xFF
+	return uint16(addr)
+}
+
 func (c *CPU) addrAbsolute() uint16 {
 	lowByte := c.Bus.Read(c.PC)
 	highByte := c.Bus.Read(c.PC + 1)
